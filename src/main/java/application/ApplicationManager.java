@@ -325,8 +325,8 @@ public class ApplicationManager {
                         cpuMap2.put(card6b, figure6b);
                         cardsListCPU2 = cardFigureSetString.addAllCardInList(cardsListCPU2, card6b);
                         figuresListCPU2 = cardFigureSetString.addAllCardInList(figuresListCPU2, figure6b);
-                        cpuValuesList = defineCardValues.numberCardListCPU_after(cardsListCPU2, cpuSumB);
-                        cpuSumB = sumOfCards.sumOfCardsInHand(cpuValuesList, "cpu");
+                        cpuValuesList2 = defineCardValues.numberCardListCPU_after(cardsListCPU2, cpuSumB);
+                        cpuSumB = sumOfCards.sumOfCardsInHand(cpuValuesList2, "cpu");
                         cpuDecision2 = cardDecision.cpuChoose(cpuSumB);
 
 
