@@ -1,11 +1,14 @@
 package application;
 
-import br.com.objectos.core.ArrayListMultimap;
-import br.com.objectos.core.Multimap;
+//import br.com.objectos.core.*;
+//import br.com.objectos.core.ArrayListMultimap;
+
 import cardGeneration.GenerationMethods;
 import cardGeneration.ShowGeneratedCard;
 import cardValues.DefineCardValues;
 import cardValues.SumOfCards;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import decisions.CardDecision;
 import decisions.CardFigureSetString;
 import winner.CheckWinner;
@@ -13,9 +16,10 @@ import winner.CheckWinner;
 import java.util.List;
 import java.util.Scanner;
 
+//import com.google.common.collect.ArrayListMultimap;
+
 public class ApplicationManager {
     public void manageGame() {
-
 
         GenerationMethods generationMethods = new GenerationMethods();
         ShowGeneratedCard showGeneratedCard = new ShowGeneratedCard(generationMethods);
@@ -38,64 +42,55 @@ public class ApplicationManager {
         }
         switch (option) {
             case 1:
-                Multimap<String, String> myMap = ArrayListMultimap.create();
-                String card1 = generationMethods.generateRandomCard();
-                String figure1 = generationMethods.generateRandomFigure();
-                myMap.put(card1, figure1);
+                Multimap<String, String> playerMap = ArrayListMultimap.create();
+                String card1Player = generationMethods.generateRandomCard();
+                String figure1Player = generationMethods.generateRandomFigure();
+                playerMap.put(card1Player, figure1Player);
 
-                String card2 = generationMethods.generateRandomCard();
-                String figure2 = generationMethods.generateRandomFigure();
+                String card2Player = generationMethods.generateRandomCard();
+                String figure2Player = generationMethods.generateRandomFigure();
                 //because of multimap we need to generate first 2 different cards which are not put in the map correctly because of same key
-                if (!card1.equals(card2)) {
-                    myMap.put(card2, figure2);
-                    generationMethods.showCardCorrectly(myMap);
-                    System.out.println();
-                } else {
-                    card2 = generationMethods.generateRandomCard();
-                    figure2 = generationMethods.generateRandomFigure();
-                    myMap.put(card2, figure2);
-                    generationMethods.showCardCorrectly(myMap);
-                    System.out.println();
 
-
+                while (card1Player.equals(card2Player)) {
+                    card2Player = generationMethods.generateRandomCard();
+                    figure2Player = generationMethods.generateRandomFigure();
                 }
+                playerMap.put(card2Player, figure2Player);
+                generationMethods.showCardCorrectly(playerMap);
+                System.out.println();
 
 
                 //calculator de vazut doar o carte
 
 
-                List<String> cardsListPlayer = cardFigureSetString.introduceFirstCardList(myMap);
-                List<String> figuresListPlayer = cardFigureSetString.introduceFirstFigureList(myMap);
+                List<String> cardsListPlayer = cardFigureSetString.introduceFirstCardList(playerMap);
+                List<String> figuresListPlayer = cardFigureSetString.introduceFirstFigureList(playerMap);
 
                 System.out.println("First CPU card");
 
                 Multimap<String, String> cpuMap = ArrayListMultimap.create();
-                String card4 = generationMethods.generateRandomCard();
-                String figure4 = generationMethods.generateRandomFigure();
+                String card1Cpu = generationMethods.generateRandomCard();
+                String figure1Cpu = generationMethods.generateRandomFigure();
 
 
-                while ((figure4.equals(figure1) && card4.equals(card1)) || (figure4.equals(figure2) && card4.equals(card2))) {
-                    System.out.println("Regenerating");
-                    card4 = generationMethods.generateRandomCard();
-                    figure4 = generationMethods.generateRandomFigure();
+                while (cpuMap.containsEntry(card1Cpu, figure1Cpu) || playerMap.containsEntry(card1Cpu, figure1Cpu)) {
+                    card1Cpu = generationMethods.generateRandomCard();
+                    figure1Cpu = generationMethods.generateRandomFigure();
                 }
 
-                cpuMap.put(card4, figure4);
+                cpuMap.put(card1Cpu, figure1Cpu);
                 generationMethods.showCardCorrectly(cpuMap);
 
-                String card5 = generationMethods.generateRandomCard();
-                String figure5 = generationMethods.generateRandomFigure();
+                String card2Cpu = generationMethods.generateRandomCard();
+                String figure2Cpu = generationMethods.generateRandomFigure();
 
-                if (card4.equals(card5)) {
-                    while ((figure5.equals(figure1) && card5.equals(card1)) || (figure5.equals(figure2) && card5.equals(card2)) ||
-                            (figure5.equals(figure4) && card5.equals(card4))) {
-                        System.out.println("Regenerating");
-                        card5 = generationMethods.generateRandomCard();
-                        figure5 = generationMethods.generateRandomFigure();
-                    }
+                while (cpuMap.containsEntry(card2Cpu, figure2Cpu) || playerMap.containsEntry(card2Cpu, figure2Cpu)) {
+                    card2Cpu = generationMethods.generateRandomCard();
+                    figure2Cpu = generationMethods.generateRandomFigure();
                 }
 
-                cpuMap.put(card5, figure5);
+
+                cpuMap.put(card2Cpu, figure2Cpu);
 
                 System.out.println();
 
@@ -107,30 +102,21 @@ public class ApplicationManager {
 
                 int newCardRequest = cardDecision.requestCard();
                 //we need temp values to store the new generated figure and card
-                String tempCard = "";
-                String tempFigure = "";
                 while (newCardRequest == 1) {
 
-                    String card3 = generationMethods.generateRandomCard();
-                    String figure3 = generationMethods.generateRandomFigure();
-                    if ((figure3.equals(figure1) && card3.equals(card1)) || (figure3.equals(figure2) && card3.equals(card2)) ||
-                            (cardsListPlayer.contains(card3) && figuresListPlayer.contains(figure3))) {
-                        System.out.println("try again because a same card has been generated");
-                    } else {
+                    String extraCardPlayer = generationMethods.generateRandomCard();
+                    String extraFigurePlayer = generationMethods.generateRandomFigure();
+                    while (playerMap.containsEntry(extraCardPlayer, extraFigurePlayer) || cpuMap.containsEntry(extraCardPlayer, extraFigurePlayer)) {
+                        System.out.println("Regenerating card!");
                         //add in new list
-                        myMap.put(card3, figure3);
-                        tempCard = card3;
-                        tempFigure = figure3;
-
-                        cardsListPlayer = cardFigureSetString.addAllCardInList(cardsListPlayer, card3);
-                        figuresListPlayer = cardFigureSetString.addAllCardInList(figuresListPlayer, figure3);
-
+                        extraCardPlayer = generationMethods.generateRandomCard();
+                        extraFigurePlayer = generationMethods.generateRandomFigure();
                     }
-
-                    generationMethods.showCardCorrectly(myMap);
-
+                    playerMap.put(extraCardPlayer, extraFigurePlayer);
+                    cardsListPlayer = cardFigureSetString.addAllCardInList(cardsListPlayer, extraCardPlayer);
+                    figuresListPlayer = cardFigureSetString.addAllCardInList(figuresListPlayer, extraFigurePlayer);
+                    generationMethods.showCardCorrectly(playerMap);
                     newCardRequest = cardDecision.requestCard();
-
 
                 }
 
@@ -144,40 +130,36 @@ public class ApplicationManager {
 
                 while (cpuDecision == 1) {
 
-                    String card6 = generationMethods.generateRandomCard();
-                    String figure6 = generationMethods.generateRandomFigure();
-                    if ((figure6.equals(figure1) && card6.equals(card1)) || (figure6.equals(figure2) && card6.equals(card2)) ||
-                            (figure6.equals(tempFigure) && card6.equals(tempCard)) || (figure6.equals(figure4) && card6.equals(card4)) ||
-                            (figure6.equals(figure5) && card6.equals(card5)) ||
-                            (cardsListCPU.contains(card6) && figuresListCPU.contains(card6)) //||
-                        //(cardsListPlayer.contains(card6) && figuresListPlayer.contains(card6))
-                    ) {
+                    String extraCardCpu = generationMethods.generateRandomCard();
+                    String extraFigureCpu = generationMethods.generateRandomFigure();
+                    while (playerMap.containsEntry(extraCardCpu, extraFigureCpu) || cpuMap.containsEntry(extraCardCpu, extraFigureCpu)) {
                         System.out.println("Regenerating");
-
-                    } else {
-                        cpuMap.put(card6, figure6);
-                        cardsListCPU = cardFigureSetString.addAllCardInList(cardsListCPU, card6);
-                        figuresListCPU = cardFigureSetString.addAllCardInList(figuresListCPU, figure6);
-                        cpuValuesList = defineCardValues.numberCardListCPU_after(cardsListCPU, cpuSum);
-                        cpuSum = sumOfCards.sumOfCardsInHand(cpuValuesList, "cpu");
-                        cpuDecision = cardDecision.cpuChoose(cpuSum);
-
-
+                        extraCardCpu = generationMethods.generateRandomCard();
+                        extraFigureCpu = generationMethods.generateRandomFigure();
                     }
+                    cpuMap.put(extraCardCpu, extraFigureCpu);
+                    cardsListCPU = cardFigureSetString.addAllCardInList(cardsListCPU, extraCardCpu);
+                    figuresListCPU = cardFigureSetString.addAllCardInList(figuresListCPU, extraFigureCpu);
+                    cpuValuesList = defineCardValues.numberCardListCPU_after(cardsListCPU, cpuSum);
+                    cpuSum = sumOfCards.sumOfCardsInHand(cpuValuesList, "cpu");
+                    cpuDecision = cardDecision.cpuChoose(cpuSum);
+
+
                 }
+
 
                 System.out.println("Showing final cards");
 
-                try{
-                Thread thread = new Thread();
+                try {
+                    Thread thread = new Thread();
 
-                thread.sleep(2500);
-                }catch(InterruptedException e){
+                    thread.sleep(2500);
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
 
                 System.out.print("Player's cards ");
-                generationMethods.showCardCorrectly(myMap);
+                generationMethods.showCardCorrectly(playerMap);
                 System.out.println();
                 System.out.print("CPU's cards ");
                 generationMethods.showCardCorrectly(cpuMap);
@@ -185,11 +167,11 @@ public class ApplicationManager {
                 System.out.println("Calculating scores");
 
 
-                try{
+                try {
                     Thread thread = new Thread();
 
                     thread.sleep(3000);
-                }catch(InterruptedException e){
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
 
@@ -207,62 +189,51 @@ public class ApplicationManager {
 
                 break;
             case 2:
-                Multimap<String, String> myMap2 = ArrayListMultimap.create();
-                String card1b = generationMethods.generateRandomCard();
-                String figure1b = generationMethods.generateRandomFigure();
-                myMap2.put(card1b, figure1b);
+                Multimap<String, String> playerMap2 = ArrayListMultimap.create();
+                String card1Player1 = generationMethods.generateRandomCard();
+                String figurePlayer1 = generationMethods.generateRandomFigure();
+                playerMap2.put(card1Player1, figurePlayer1);
 
-                String card2b = generationMethods.generateRandomCard();
-                String figure2b = generationMethods.generateRandomFigure();
+                String card2Player1 = generationMethods.generateRandomCard();
+                String figure2Player1 = generationMethods.generateRandomFigure();
                 //because of multimap we need to generate first 2 different cards which are not put in the map correctly because of same key
-                if (!card1b.equals(card2b)) {
-                    myMap2.put(card2b, figure2b);
-                    generationMethods.showCardCorrectly(myMap2);
-                    System.out.println();
-                } else {
-                    card2b = generationMethods.generateRandomCard();
-                    figure2b = generationMethods.generateRandomFigure();
-                    myMap2.put(card2b, figure2b);
-                    generationMethods.showCardCorrectly(myMap2);
-                    System.out.println();
-
-
+                while (card1Player1.equals(card2Player1)) {
+                    card2Player1 = generationMethods.generateRandomCard();
+                    figure2Player1 = generationMethods.generateRandomFigure();
                 }
-
+                playerMap2.put(card2Player1, figure2Player1);
+                generationMethods.showCardCorrectly(playerMap2);
+                System.out.println();
+                    
 
                 //calculator de vazut doar o carte
 
 
-                List<String> cardsListPlayerB = cardFigureSetString.introduceFirstCardList(myMap2);
-                List<String> figuresListPlayerB = cardFigureSetString.introduceFirstFigureList(myMap2);
+                List<String> cardsListPlayerB = cardFigureSetString.introduceFirstCardList(playerMap2);
+                List<String> figuresListPlayerB = cardFigureSetString.introduceFirstFigureList(playerMap2);
 
 
                 Multimap<String, String> cpuMap2 = ArrayListMultimap.create();
-                String card4b = generationMethods.generateRandomCard();
-                String figure4b = generationMethods.generateRandomFigure();
+                String card1Cpu2 = generationMethods.generateRandomCard();
+                String figure1Cpu2 = generationMethods.generateRandomFigure();
 
 
-                while ((figure4b.equals(figure1b) && card4b.equals(card1b)) || (figure4b.equals(figure2b) && card4b.equals(card2b))) {
-                    System.out.println("Regenerating");
-                    card4b = generationMethods.generateRandomCard();
-                    figure4b = generationMethods.generateRandomFigure();
+                while(cpuMap2.containsEntry(card1Cpu2, figure1Cpu2)|| playerMap2.containsEntry(card1Cpu2, figure1Cpu2)){
+                    card1Cpu2 = generationMethods.generateRandomCard();
+                    figure1Cpu2 = generationMethods.generateRandomFigure();
                 }
 
-                cpuMap2.put(card4b, figure4b);
+                cpuMap2.put(card1Cpu2, figure1Cpu2);
 
-                String card5b = generationMethods.generateRandomCard();
-                String figure5b = generationMethods.generateRandomFigure();
+                String card2Cpu2 = generationMethods.generateRandomCard();
+                String figure2Cpu2 = generationMethods.generateRandomFigure();
 
-                if (card4b.equals(card5b)) {
-                    while ((figure5b.equals(figure1b) && card5b.equals(card1b)) || (figure5b.equals(figure2b) && card5b.equals(card2b)) ||
-                            (figure5b.equals(figure4b) && card5b.equals(card4b))) {
-                        System.out.println("Regenerating");
-                        card5b = generationMethods.generateRandomCard();
-                        figure5b = generationMethods.generateRandomFigure();
-                    }
+                while(cpuMap2.containsEntry(card2Cpu2, figure2Cpu2)||playerMap2.containsEntry(card2Cpu2, figure2Cpu2)){
+                    card2Cpu2 = generationMethods.generateRandomCard();
+                    figure2Cpu2 = generationMethods.generateRandomFigure();
                 }
 
-                cpuMap2.put(card5b, figure5b);
+                cpuMap2.put(card2Cpu2, figure2Cpu2);
 
                 System.out.println();
 
@@ -274,30 +245,21 @@ public class ApplicationManager {
 
                 int newCardRequest2 = cardDecision.requestCard();
                 //we need temp values to store the new generated figure and card
-                String tempCard2 = "";
-                String tempFigure2 = "";
                 while (newCardRequest2 == 1) {
 
-                    String card3b = generationMethods.generateRandomCard();
-                    String figure3b = generationMethods.generateRandomFigure();
-                    if ((figure3b.equals(figure1b) && card3b.equals(card1b)) || (figure3b.equals(figure2b) && card3b.equals(card2b)) ||
-                            (cardsListPlayerB.contains(card3b) && figuresListPlayerB.contains(figure3b))) {
-                        System.out.println("try again because a same card has been generated");
-                    } else {
+                    String extraCardPlayer = generationMethods.generateRandomCard();
+                    String extraFigurePlayer = generationMethods.generateRandomFigure();
+                    while (playerMap2.containsEntry(extraCardPlayer, extraFigurePlayer) || cpuMap2.containsEntry(extraCardPlayer, extraFigurePlayer)) {
+                        System.out.println("Regenerating card!");
                         //add in new list
-                        myMap2.put(card3b, figure3b);
-                        tempCard2 = card3b;
-                        tempFigure2 = figure3b;
-
-                        cardsListPlayerB = cardFigureSetString.addAllCardInList(cardsListPlayerB, card3b);
-                        figuresListPlayerB = cardFigureSetString.addAllCardInList(figuresListPlayerB, figure3b);
-
+                        extraCardPlayer = generationMethods.generateRandomCard();
+                        extraFigurePlayer = generationMethods.generateRandomFigure();
                     }
-
-                    generationMethods.showCardCorrectly(myMap2);
-
+                    playerMap2.put(extraCardPlayer, extraFigurePlayer);
+                    cardsListPlayerB = cardFigureSetString.addAllCardInList(cardsListPlayerB, extraCardPlayer);
+                    figuresListPlayerB = cardFigureSetString.addAllCardInList(figuresListPlayerB, extraFigurePlayer);
+                    generationMethods.showCardCorrectly(playerMap2);
                     newCardRequest2 = cardDecision.requestCard();
-
 
                 }
 
@@ -311,26 +273,19 @@ public class ApplicationManager {
 
                 while (cpuDecision2 == 1) {
 
-                    String card6b = generationMethods.generateRandomCard();
-                    String figure6b = generationMethods.generateRandomFigure();
-                    if ((figure6b.equals(figure1b) && card6b.equals(card1b)) || (figure6b.equals(figure2b) && card6b.equals(card2b)) ||
-                            (figure6b.equals(tempFigure2) && card6b.equals(tempCard2)) || (figure6b.equals(figure4b) && card6b.equals(card4b)) ||
-                            (figure6b.equals(figure5b) && card6b.equals(card5b)) ||
-                            (cardsListCPU2.contains(card6b) && figuresListCPU2.contains(card6b)) //||
-                        //(cardsListPlayer.contains(card6) && figuresListPlayer.contains(card6))
-                    ) {
+                    String extraCardCpu = generationMethods.generateRandomCard();
+                    String extraFigureCpu = generationMethods.generateRandomFigure();
+                    while (playerMap2.containsEntry(extraCardCpu, extraFigureCpu) || cpuMap2.containsEntry(extraCardCpu, extraFigureCpu)) {
                         System.out.println("Regenerating");
-
-                    } else {
-                        cpuMap2.put(card6b, figure6b);
-                        cardsListCPU2 = cardFigureSetString.addAllCardInList(cardsListCPU2, card6b);
-                        figuresListCPU2 = cardFigureSetString.addAllCardInList(figuresListCPU2, figure6b);
-                        cpuValuesList2 = defineCardValues.numberCardListCPU_after(cardsListCPU2, cpuSumB);
-                        cpuSumB = sumOfCards.sumOfCardsInHand(cpuValuesList2, "cpu");
-                        cpuDecision2 = cardDecision.cpuChoose(cpuSumB);
-
-
+                        extraCardCpu = generationMethods.generateRandomCard();
+                        extraFigureCpu = generationMethods.generateRandomFigure();
                     }
+                    cpuMap2.put(extraCardCpu, extraFigureCpu);
+                    cardsListCPU2 = cardFigureSetString.addAllCardInList(cardsListCPU2, extraCardCpu);
+                    figuresListCPU2 = cardFigureSetString.addAllCardInList(figuresListCPU2, extraFigureCpu);
+                    cpuValuesListB = defineCardValues.numberCardListCPU_after(cardsListCPU2, cpuSumB);
+                    cpuSumB = sumOfCards.sumOfCardsInHand(cpuValuesListB, "cpu");
+                    cpuDecision2 = cardDecision.cpuChoose(cpuSumB);
                 }
 
                 System.out.println("Showing cards");
@@ -340,12 +295,11 @@ public class ApplicationManager {
 
 
                     thread.sleep(2500);
-                }
-                catch (InterruptedException e){
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
                 System.out.print("Player's cards ");
-                generationMethods.showCardCorrectly(myMap2);
+                generationMethods.showCardCorrectly(playerMap2);
                 System.out.println();
                 System.out.print("CPU's cards ");
                 generationMethods.showCardCorrectly(cpuMap2);
@@ -353,11 +307,11 @@ public class ApplicationManager {
 
                 System.out.println("Calculating");
 
-                try{
+                try {
                     Thread thread = new Thread();
 
                     thread.sleep(3000);
-                }catch(InterruptedException e){
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
 
